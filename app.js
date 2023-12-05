@@ -6,22 +6,22 @@ const jwt = require("jsonwebtoken");
 
 const app = express();
 
-// models
+// Modelos
 const User = require("./models/User");
 
-// Config JSON response
+// Configurando resposta do Json
 app.use(express.json());
 
-// Open Route
+// Abrindo as Rotas
 app.get("/", (req, res) => {
   res.status(200).json({ msg: "Bem vindo a API!" });
 });
 
-// Private Route
+// Deixando as Rotas Privadas
 app.get("/user/:id", checkToken, async (req, res) => {
   const id = req.params.id;
 
-  // check if user exists
+  // Checando se a usuário existente
   const user = await User.findById(id, "-password");
 
   if (!user) {
@@ -51,7 +51,7 @@ function checkToken(req, res, next) {
 app.post("/auth/register", async (req, res) => {
   const { name, email, password, confirmpassword } = req.body;
 
-  // validations
+  // Validando
   if (!name) {
     return res.status(422).json({ msg: "O nome é obrigatório!" });
   }
@@ -70,18 +70,18 @@ app.post("/auth/register", async (req, res) => {
       .json({ msg: "A senha e a confirmação precisam ser iguais!" });
   }
 
-  // check if user exists
+  // Chegando se a usuário existente
   const userExists = await User.findOne({ email: email });
 
   if (userExists) {
     return res.status(422).json({ msg: "Por favor, utilize outro e-mail!" });
   }
 
-  // create password
+  // Criar senha
   const salt = await bcrypt.genSalt(12);
   const passwordHash = await bcrypt.hash(password, salt);
 
-  // create user
+  // Criar Usuarios
   const user = new User({
     name,
     email,
@@ -100,7 +100,7 @@ app.post("/auth/register", async (req, res) => {
 app.post("/auth/login", async (req, res) => {
   const { email, password } = req.body;
 
-  // validations
+  // Validações
   if (!email) {
     return res.status(422).json({ msg: "O email é obrigatório!" });
   }
@@ -109,14 +109,14 @@ app.post("/auth/login", async (req, res) => {
     return res.status(422).json({ msg: "A senha é obrigatória!" });
   }
 
-  // check if user exists
+  // Checando usuário existentes
   const user = await User.findOne({ email: email });
 
   if (!user) {
     return res.status(404).json({ msg: "Usuário não encontrado!" });
   }
 
-  // check if password match
+  // Checando senhas existentes
   const checkPassword = await bcrypt.compare(password, user.password);
 
   if (!checkPassword) {
