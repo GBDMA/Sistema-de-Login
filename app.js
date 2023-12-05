@@ -139,6 +139,16 @@ app.post("/auth/login", async (req, res) => {
   }
 });
 
+// READ - Listar todos os usuários
+app.get("/users", async (req, res) => {
+  try {
+    const users = await User.find({}, "-password"); // Exclui o campo de senha
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+});
+
 // CREATE - Criar um novo usuário
 app.post("/user", async (req, res) => {
   const { name, email, password } = req.body;
@@ -171,7 +181,7 @@ const dbPassword = process.env.DB_PASS;
 
 mongoose
   .connect(
-    `mongodb+srv://${dbUser}:${dbPassword}@cluster0.folvv.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
+    `mongodb+srv://${dbUser}:${dbPassword}@cluster0.rlypp9w.mongodb.net/?retryWrites=true&w=majority`
   )
   .then(() => {
     console.log("Conectou ao banco!");
