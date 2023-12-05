@@ -139,6 +139,33 @@ app.post("/auth/login", async (req, res) => {
   }
 });
 
+// CREATE - Criar um novo usuário
+app.post("/user", async (req, res) => {
+  const { name, email, password } = req.body;
+
+  try {
+    // Verifica se o usuário já existe
+    const userExists = await User.findOne({ email: email });
+    if (userExists) {
+      return res.status(422).json({ msg: "O usuário já existe!" });
+    }
+
+    const salt = await bcrypt.genSalt(12);
+    const passwordHash = await bcrypt.hash(password, salt);
+
+    const newUser = new User({
+      name,
+      email,
+      passwordHash,
+    });
+
+    await newUser.save();
+    res.status(201).json({ msg: "Usuário criado com sucesso!" });
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+});
+
 const dbUser = process.env.DB_USER;
 const dbPassword = process.env.DB_PASS;
 
